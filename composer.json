@@ -1,0 +1,17 @@
+{
+    "name": "pagnany/testo",
+    "description": "testoooo",
+    "type": "project",
+    "license": "none",
+    "autoload": {
+        "psr-4": {
+            "Pagnany\\Testo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pagnany"
+        }
+    ],
+    "require": {}
+}

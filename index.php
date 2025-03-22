@@ -2,7 +2,7 @@
 
 require __DIR__ . '/vendor/autoload.php';  // Ensure correct path
 
-use Pagnany\Testo\Test;
+use Pagnany\Kcp\Test;
 
 $test = new Test();
 echo $test->sayHello();
@@ -10,11 +10,11 @@ echo $test->sayHello();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KCP</title>
+    <title>KCP - Home</title>
 </head>
 <body>
     <h2>Wilkommen beim Kegelclub Pegelbrüder</h2>

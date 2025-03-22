@@ -1,11 +1,11 @@
 {
-    "name": "pagnany/testo",
-    "description": "testoooo",
+    "name": "pagnany/kcp",
+    "description": "KCP",
     "type": "project",
     "license": "none",
     "autoload": {
         "psr-4": {
-            "Pagnany\\Testo\\": "src/"
+            "Pagnany\\Kcp\\": "src/"
         }
     },
     "authors": [

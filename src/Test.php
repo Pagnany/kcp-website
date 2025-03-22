@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagnany\Testo;
+namespace Pagnany\Kcp;
 
 class Test {
     public function sayHello(): string {

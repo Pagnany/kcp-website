@@ -7,4 +7,3 @@ class Test {
         return "Hallo Pegelbruder!";
     }
 }
-?>

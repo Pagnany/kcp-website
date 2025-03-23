@@ -1,19 +1,18 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
+use Pagnany\Kcp\Auth\LoginHandler;
+
 // Simple login processing (for demonstration only, don't use in production)
 $loginMessage = '';
+$loginHandler = new LoginHandler();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Simulate a simple check (replace this with real validation in a production app)
-    if ($username === 'admin' && $password === 'password') {
-        $loginMessage = 'Login successful!';
-    } else {
-        $loginMessage = 'Invalid username or password.';
-    }
+    $result = $loginHandler->processLogin($username, $password);
+    $loginMessage = $result['message'];
 }
 ?>
 
@@ -22,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>KCP - Login</title>
 </head>
 <body>

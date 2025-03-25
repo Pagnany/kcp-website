@@ -5,6 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
 use Pagnany\Kcp\Auth\Auth;
 
 $isLoggedIn = Auth::isLoggedIn();
+define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +17,8 @@ $isLoggedIn = Auth::isLoggedIn();
     <title>KCP - Home</title>
 </head>
 <body>
+    <?php include __DIR__ . '/public/includes/header.php'; ?>
+
     <h1>Kegelclub Pegelbrüder</h1>
 
     <?php if ($isLoggedIn): ?>

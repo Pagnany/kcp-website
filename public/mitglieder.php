@@ -18,6 +18,8 @@ try {
 } catch (\PDOException $e) {
     $error = "Datenbankfehler: " . $e->getMessage();
 }
+
+define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +31,9 @@ try {
     <title>KCP - Mitglieder</title>
 </head>
 <body>
-    <h1>Mitglieder</h1>
+    <?php include __DIR__ . '/includes/header.php'; ?>
+
+    <h2>Mitglieder</h2>
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
@@ -52,7 +56,7 @@ try {
                 <?php foreach ($members as $member): ?>
                     <div class="member-item">
                         <div class="member-info">
-                            <h2><?= htmlspecialchars($member['nickname']) ?></h2>
+                            <h3><?= htmlspecialchars($member['nickname']) ?></h3>
                             <p class="member-name">
                                 <?= htmlspecialchars($member['vorname']) ?> 
                                 <?= htmlspecialchars($member['nachname']) ?>

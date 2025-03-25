@@ -1,3 +1,12 @@
+<?php
+require __DIR__ . '/../vendor/autoload.php';
+
+use Pagnany\Kcp\Auth\Auth;
+
+$isLoggedIn = Auth::isLoggedIn();
+define('INCLUDED', true);
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,11 +16,15 @@
     <title>KCP - Strafen</title>
 </head>
 <body>
-    <h1>Strafen</h1>
+    <?php include __DIR__ . '/includes/header.php'; ?>
+
+    <h2>Strafen</h2>
+    <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
                 <li><a href="/public/strafen/kegelstrafen.php">Kegelstrafen</a></li>
             </ul>
         </nav>
+    <?php endif; ?>
 </body>
 </html>

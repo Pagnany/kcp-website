@@ -18,6 +18,8 @@ try {
 } catch (\PDOException $e) {
     $error = "Datenbankfehler: " . $e->getMessage();
 }
+
+define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +31,9 @@ try {
     <title>KCP - Veranstaltungen</title>
 </head>
 <body>
-    <h1>Veranstaltungen</h1>
+    <?php include __DIR__ . '/includes/header.php'; ?>
+
+    <h2>Veranstaltungen</h2>
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
@@ -50,7 +54,7 @@ try {
         <?php else: ?>
             <?php foreach ($events as $event): ?>
                 <div class="event-card">
-                    <h2><?= htmlspecialchars($event['titel']) ?></h2>
+                    <h3><?= htmlspecialchars($event['titel']) ?></h3>
                     <p class="event-description"><?= nl2br(htmlspecialchars($event['beschreibung'])) ?></p>
                     <p class="event-date">
                         Von: <?= date('d.m.Y', strtotime($event['datumvon'])) ?>

@@ -98,3 +98,90 @@ aside,
 		font-size: 18px;
 	}
 }
+
+/* Event styles */
+.events-container {
+	max-width: 800px;
+	margin: 20px auto;
+	padding: 0 20px;
+}
+
+.event-card {
+	background-color: #333;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 20px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.event-card h2 {
+	margin-top: 0;
+	color: #1e8ad6;
+}
+
+.event-description {
+	margin: 15px 0;
+	white-space: pre-wrap;
+}
+
+.event-date {
+	color: #888;
+	font-size: 0.9em;
+	margin: 0;
+}
+
+/* Error message styles */
+.error-message {
+	background-color: #ff4444;
+	color: white;
+	padding: 15px;
+	margin: 20px auto;
+	max-width: 800px;
+	border-radius: 8px;
+	text-align: center;
+	font-weight: bold;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Member styles */
+.members-container {
+	max-width: 800px;
+	margin: 20px auto;
+	padding: 0 20px;
+}
+
+.members-list {
+	margin-top: 20px;
+}
+
+.member-item {
+	background-color: #333;
+	border-radius: 8px;
+	padding: 15px 20px;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.member-item:hover {
+	transform: translateX(5px);
+	background-color: #3a3a3a;
+}
+
+.member-info {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.member-info h2 {
+	margin: 0;
+	color: #1e8ad6;
+	font-size: 1.4em;
+}
+
+.member-name {
+	color: #fafafa;
+	margin: 0;
+	font-size: 1.1em;
+}

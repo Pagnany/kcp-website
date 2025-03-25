@@ -5,7 +5,6 @@ require __DIR__ . '/vendor/autoload.php';
 use Pagnany\Kcp\Auth\Auth;
 
 $isLoggedIn = Auth::isLoggedIn();
-define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +16,9 @@ define('INCLUDED', true);
     <title>KCP - Home</title>
 </head>
 <body>
-    <?php include __DIR__ . '/public/includes/header.php'; ?>
+    <header class="site-header">
+        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+    </header> 
 
     <h1>Kegelclub Pegelbrüder</h1>
 

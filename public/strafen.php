@@ -16,7 +16,10 @@ define('INCLUDED', true);
     <title>KCP - Strafen</title>
 </head>
 <body>
-    <?php include __DIR__ . '/includes/header.php'; ?>
+    <header class="site-header">
+        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+    </header> 
+
 
     <h2>Strafen</h2>
     <?php if ($isLoggedIn): ?>

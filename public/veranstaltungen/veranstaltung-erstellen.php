@@ -32,8 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Datenbankfehler: " . $e->getMessage();
     }
 }
-
-define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +43,9 @@ define('INCLUDED', true);
     <title>KCP - Veranstaltung erstellen</title>
 </head>
 <body>
-    <?php include __DIR__ . '/../includes/header.php'; ?>
+    <header class="site-header">
+        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+    </header> 
 
     <h2>Veranstaltung erstellen</h2>
     <nav>

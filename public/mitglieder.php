@@ -18,8 +18,6 @@ try {
 } catch (\PDOException $e) {
     $error = "Datenbankfehler: " . $e->getMessage();
 }
-
-define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +29,9 @@ define('INCLUDED', true);
     <title>KCP - Mitglieder</title>
 </head>
 <body>
-    <?php include __DIR__ . '/includes/header.php'; ?>
+    <header class="site-header">
+        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+    </header> 
 
     <h2>Mitglieder</h2>
     <?php if ($isLoggedIn): ?>

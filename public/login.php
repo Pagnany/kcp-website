@@ -31,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>KCP - Login</title>
 </head>
 <body>
+    <header class="site-header">
+        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+    </header> 
     <h2>Login</h2>
     
     <?php if ($loginMessage): ?>

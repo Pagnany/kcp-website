@@ -9,7 +9,7 @@ $error = null;
 $success = null;
 
 if (!$isLoggedIn) {
-    header('Location: /public/login.php');
+    header('Location: /public/login');
     exit;
 }
 
@@ -44,13 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <header class="site-header">
-        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+        <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
 
     <h2>Veranstaltung erstellen</h2>
     <nav>
         <ul>
-            <li><a href="/public/veranstaltungen.php">Zurück zur Übersicht</a></li>
+            <li><a href="veranstaltungen">Zurück zur Übersicht</a></li>
         </ul>
     </nav>
 

@@ -30,14 +30,14 @@ try {
 </head>
 <body>
     <header class="site-header">
-        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+        <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
 
     <h2>Veranstaltungen</h2>
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
-                <li><a href="veranstaltungen/veranstaltung-erstellen.php">Veranstaltung erstellen</a></li>
+                <li><a href="veranstaltung-erstellen">Veranstaltung erstellen</a></li>
             </ul>
         </nav>
     <?php endif; ?>

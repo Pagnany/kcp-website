@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $loginHandler->processLogin($username, $password);
     
     if ($result['success']) {
-        header('Location: /index.php');
+        header('Location: /');
         exit;
     } else {
         $loginMessage = $result['message'];
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <header class="site-header">
-        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+        <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
     <h2>Login</h2>
     
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <!-- Simple login form -->
-    <form method="POST" action="login.php">
+    <form method="POST" action="login">
         <label for="username">Benutzername:</label>
         <input type="text" id="username" name="username" required><br><br>
         

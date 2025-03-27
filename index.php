@@ -17,7 +17,7 @@ $isLoggedIn = Auth::isLoggedIn();
 </head>
 <body>
     <header class="site-header">
-        <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
+        <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
 
     <h1>Kegelclub Pegelbrüder</h1>
@@ -25,14 +25,14 @@ $isLoggedIn = Auth::isLoggedIn();
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
-                <li><a href="public/strafen.php">Strafen</a></li>
-                <li><a href="public/mitglieder.php">Mitglieder</a></li>
-                <li><a href="public/veranstaltungen.php">Veranstaltungen</a></li>
-                <li><a href="public/statistiken.php">Statistiken</a></li>
+                <li><a href="public/strafen/strafen">Strafen</a></li>
+                <li><a href="public/mitglieder">Mitglieder</a></li>
+                <li><a href="public/veranstaltungen/veranstaltungen">Veranstaltungen</a></li>
+                <li><a href="public/statistiken">Statistiken</a></li>
             </ul>
         </nav>
     <?php else: ?>
-        <a href="public/login.php">Login</a>
+        <a href="public/login">Login</a>
     <?php endif; ?>
 </body>
 </html>

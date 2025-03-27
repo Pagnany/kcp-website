@@ -1,10 +1,9 @@
 <?php
-require __DIR__ . '/../vendor/autoload.php';
+require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 use Pagnany\Kcp\Auth\Auth;
 
 $isLoggedIn = Auth::isLoggedIn();
-define('INCLUDED', true);
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +18,6 @@ define('INCLUDED', true);
     <header class="site-header">
         <h1 class="site-title"><a href="/index.php">Kegelclub Pegelbrüder</a></h1>
     </header> 
-
 
     <h2>Strafen</h2>
     <?php if ($isLoggedIn): ?>

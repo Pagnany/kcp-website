@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php'; 
+require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 use Pagnany\Kcp\Auth\Auth;
 

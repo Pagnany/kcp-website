@@ -34,21 +34,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header class="site-header">
         <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
+
     <h2>Login</h2>
     
     <?php if ($loginMessage): ?>
-        <p><?= htmlspecialchars($loginMessage) ?></p>
+        <div class="error-message">
+            <?= htmlspecialchars($loginMessage) ?>
+        </div>
     <?php endif; ?>
 
-    <!-- Simple login form -->
-    <form method="POST" action="login">
-        <label for="username">Benutzername:</label>
-        <input type="text" id="username" name="username" required><br><br>
-        
-        <label for="password">Passwort:</label>
-        <input type="password" id="password" name="password" required><br><br>
-        
-        <button type="submit">Login</button>
-    </form>
+    <div class="form-container">
+        <form method="POST" action="login" class="event-form">
+            <div class="form-group">
+                <label for="username">Benutzername:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Passwort:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="submit-button">Login</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

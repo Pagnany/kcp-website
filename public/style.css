@@ -215,6 +215,7 @@ aside,
 
 .form-group input[type="text"],
 .form-group input[type="date"],
+.form-group input[type="password"],
 .form-group textarea {
 	width: 100%;
 	padding: 10px;

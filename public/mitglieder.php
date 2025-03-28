@@ -13,7 +13,7 @@ try {
     $conn = $db->getConnection();
 
     // Fetch members from database
-    $stmt = $conn->query("SELECT idmitglieder, nickname, vorname, nachname FROM mitglieder ORDER BY nachname, vorname");
+    $stmt = $conn->query("SELECT idmitglieder, nickname, vorname, nachname FROM mitglieder WHERE aktiv = true ORDER BY nachname, vorname");
     $members = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 } catch (\PDOException $e) {
     $error = "Datenbankfehler: " . $e->getMessage();

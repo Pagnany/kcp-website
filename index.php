@@ -20,8 +20,6 @@ $isLoggedIn = Auth::isLoggedIn();
         <h1 class="site-title"><a href="/">Kegelclub Pegelbrüder</a></h1>
     </header> 
 
-    <h1>Kegelclub Pegelbrüder</h1>
-
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>

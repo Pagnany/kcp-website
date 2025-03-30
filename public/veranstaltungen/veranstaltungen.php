@@ -38,6 +38,7 @@ try {
         <nav>
             <ul>
                 <li><a href="veranstaltung-erstellen">Veranstaltung erstellen</a></li>
+                <li><a href="anwesenheit">Anwesenheit verwalten</a></li>
             </ul>
         </nav>
     <?php endif; ?>

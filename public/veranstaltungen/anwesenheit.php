@@ -26,7 +26,7 @@ try {
     $events = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
     // Fetch members
-    $stmt = $conn->query("SELECT idmitglieder, nickname, vorname, nachname FROM mitglieder WHERE aktiv = true ORDER BY nachname, vorname");
+    $stmt = $conn->query("SELECT idmitglieder, nickname, vorname, nachname FROM mitglieder WHERE aktiv = true ORDER BY vorname, nachname");
     $members = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
     // Handle form submission
@@ -134,9 +134,8 @@ try {
                     <?php foreach ($members as $member): ?>
                         <div class="attendance-item">
                             <label class="member-name">
-                                <?= htmlspecialchars($member['nickname']) ?> 
-                                (<?= htmlspecialchars($member['vorname']) ?> 
-                                <?= htmlspecialchars($member['nachname']) ?>)
+                                <?= htmlspecialchars($member['vorname']) ?>
+                                <?= htmlspecialchars($member['nachname']) ?>
                             </label>
                             <div class="attendance-options">
                                 <label>

@@ -40,7 +40,7 @@ try {
         
         // Strafen für diese Veranstaltung laden
         $stmt = $conn->prepare("
-            SELECT s.idstrafen, s.idstrafentyp, s.betrag, s.idmitglieder, s.grund, s.istanzahl, 
+            SELECT s.idstrafen, s.idstrafentyp, s.betrag, s.idmitglieder, s.grund, s.istanzahl, s.in_durchschnitt,
                    st.bezeichnung AS strafentyp_bezeichnung, st.preis
             FROM strafen s
             LEFT JOIN strafentyp st ON s.idstrafentyp = st.id
@@ -58,7 +58,11 @@ try {
             $memberPenalties[$memberId][] = $penalty;
         }
         
-        // Mitglieder nach Anwesenheit filtern
+        // Arrays für Anwesende und Abwesende initialisieren
+        $presentMembers = [];
+        $absentMembers = [];
+        
+        // Mitglieder nach Anwesenheit filtern und Strafen berechnen
         foreach ($allMembers as $member) {
             $id = $member['idmitglieder'];
             // Strafen für dieses Mitglied hinzufügen
@@ -75,14 +79,16 @@ try {
                     if ($penalty['idstrafentyp'] > 0 && isset($penalty['preis'])) {
                         // Preis direkt aus dem Join verwenden
                         $preis = floatval($penalty['preis']);
-                        $totalPenalty += $anzahl * $preis;
+                        $strafBetrag = $anzahl * $preis;
+                        $totalPenalty += $strafBetrag;
                     } else {
                         // Bei individuellen Strafen mit istanzahl ohne Preis
                         // Nur als Information anzeigen, kein Betrag zur Summe hinzufügen
                     }
                 } else {
                     // Bei Geldbeträgen (istanzahl = 0) direkt den Betrag addieren
-                    $totalPenalty += floatval($penalty['betrag']);
+                    $strafBetrag = floatval($penalty['betrag']);
+                    $totalPenalty += $strafBetrag;
                 }
             }
             $member['total_penalty'] = $totalPenalty;
@@ -93,6 +99,18 @@ try {
                 $absentMembers[] = $member;
             }
         }
+        
+        // Durchschnittsbetrag basierend auf den Gesamtstrafen der anwesenden Mitglieder berechnen
+        $totalSumForAvg = 0;
+        $countForAvg = count($presentMembers);
+        
+        // Summe aller Strafen der anwesenden Mitglieder berechnen
+        foreach ($presentMembers as $member) {
+            $totalSumForAvg += $member['total_penalty'];
+        }
+        
+        // Durchschnittsbetrag berechnen
+        $averagePenalty = ($countForAvg > 0) ? $totalSumForAvg / $countForAvg : 0;
     }
 } catch (PDOException $e) {
     echo 'Datenbankfehler: ' . htmlspecialchars($e->getMessage());
@@ -147,6 +165,16 @@ try {
         </form>
     </div>
     <?php if ($selectedEvent): ?>
+        <?php if ($countForAvg > 0): ?>
+            <div class="info-box" style="margin: 10px auto 20px; background-color: #333; padding: 10px; border-radius: 5px; max-width: 600px; text-align: center;">
+                <p style="margin: 0;">
+                    Durchschnittsberechnung basiert auf <?= $countForAvg ?> anwesenden Mitgliedern, Gesamtsumme: <?= number_format($totalSumForAvg, 2, ',', '.') ?>€, 
+                    <strong>Durchschnitt: <?= number_format($averagePenalty, 2, ',', '.') ?>€</strong> 
+                    <br>
+                    <small style="color: #888;">Basierend auf Gesamtstrafen aller anwesenden Mitglieder</small>
+                </p>
+            </div>
+        <?php endif; ?>
         <div class="penalties-container">
             <h2>Anwesende Mitglieder</h2>
             <table class="members-list">
@@ -203,16 +231,19 @@ try {
             </table>
         </div>
         <div class="penalties-container" style="margin-top:40px;">
-            <h2>Nicht anwesende Mitglieder</h2>
+            <h2>Nicht anwesende Mitglieder (müssen Durchschnitt bezahlen)</h2>
             <table class="members-list">
-                <tr><th>Vorname</th></tr>
+                <tr><th>Vorname</th><th>Durchschnittsstrafe</th></tr>
                 <?php foreach ($absentMembers as $member): ?>
                     <tr>
                         <td><?= htmlspecialchars($member['vorname']) ?></td>
+                        <td style="font-weight: bold; color: #ff4400;">
+                            <?= number_format($averagePenalty, 2, ',', '.') ?> €
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (empty($absentMembers)): ?>
-                    <tr><td>Keine nicht anwesenden Mitglieder.</td></tr>
+                    <tr><td colspan="2">Keine nicht anwesenden Mitglieder.</td></tr>
                 <?php endif; ?>
             </table>
         </div>

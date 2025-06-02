@@ -70,7 +70,11 @@ try {
             
             // Summe der Strafen für dieses Mitglied berechnen
             $totalPenalty = 0;
+            $avgPenalty = 0; // Summe der Strafen, die in den Durchschnitt einfließen
+            
             foreach ($member['penalties'] as $penalty) {
+                $strafBetrag = 0;
+                
                 if ($penalty['istanzahl']) {
                     // Bei Anzahl (istanzahl = 1) den Strafentyp-Preis mit der Anzahl multiplizieren
                     $anzahl = intval($penalty['betrag']);
@@ -81,6 +85,11 @@ try {
                         $preis = floatval($penalty['preis']);
                         $strafBetrag = $anzahl * $preis;
                         $totalPenalty += $strafBetrag;
+                        
+                        // Nur wenn in_durchschnitt gesetzt ist, zur Durchschnittsumme addieren
+                        if ($penalty['in_durchschnitt']) {
+                            $avgPenalty += $strafBetrag;
+                        }
                     } else {
                         // Bei individuellen Strafen mit istanzahl ohne Preis
                         // Nur als Information anzeigen, kein Betrag zur Summe hinzufügen
@@ -89,9 +98,15 @@ try {
                     // Bei Geldbeträgen (istanzahl = 0) direkt den Betrag addieren
                     $strafBetrag = floatval($penalty['betrag']);
                     $totalPenalty += $strafBetrag;
+                    
+                    // Nur wenn in_durchschnitt gesetzt ist, zur Durchschnittsumme addieren
+                    if ($penalty['in_durchschnitt']) {
+                        $avgPenalty += $strafBetrag;
+                    }
                 }
             }
             $member['total_penalty'] = $totalPenalty;
+            $member['avg_penalty'] = $avgPenalty; // Strafen für Durchschnittsberechnung
             
             if (isset($attendance[$id]) && $attendance[$id] == 1) {
                 $presentMembers[] = $member;
@@ -100,13 +115,14 @@ try {
             }
         }
         
-        // Durchschnittsbetrag basierend auf den Gesamtstrafen der anwesenden Mitglieder berechnen
+        // Durchschnittsbetrag basierend auf den Strafen der anwesenden Mitglieder berechnen, die für den Durchschnitt zählen
         $totalSumForAvg = 0;
         $countForAvg = count($presentMembers);
         
-        // Summe aller Strafen der anwesenden Mitglieder berechnen
+        // Summe aller Strafen der anwesenden Mitglieder berechnen, die für den Durchschnitt berücksichtigt werden sollen
         foreach ($presentMembers as $member) {
-            $totalSumForAvg += $member['total_penalty'];
+            // Verwende die bereits berechnete Summe der Strafen, die für den Durchschnitt zählen
+            $totalSumForAvg += $member['avg_penalty'];
         }
         
         // Durchschnittsbetrag berechnen
@@ -171,7 +187,7 @@ try {
                     Durchschnittsberechnung basiert auf <?= $countForAvg ?> anwesenden Mitgliedern, Gesamtsumme: <?= number_format($totalSumForAvg, 2, ',', '.') ?>€, 
                     <strong>Durchschnitt: <?= number_format($averagePenalty, 2, ',', '.') ?>€</strong> 
                     <br>
-                    <small style="color: #888;">Basierend auf Gesamtstrafen aller anwesenden Mitglieder</small>
+                    <small style="color: #888;">Nur Strafen mit "in_durchschnitt" fließen in die Berechnung ein</small>
                 </p>
             </div>
         <?php endif; ?>
@@ -194,9 +210,15 @@ try {
                                         <?php if ($penalty['idstrafentyp'] > 0): ?>
                                             <?= htmlspecialchars($penalty['strafentyp_bezeichnung']) ?>
                                             (<?= $penalty['istanzahl'] ? $penalty['betrag'] . 'x' : number_format($penalty['betrag'], 2, ',', '.') . '€' ?>)
+                                            <?php if ($penalty['in_durchschnitt']): ?>
+                                                <span style="color:#4CAF50; margin-left:3px;" title="Fließt in die Durchschnittsberechnung ein">⚖️</span>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <?= htmlspecialchars($penalty['grund']) ?>
                                             (<?= $penalty['istanzahl'] ? $penalty['betrag'] . 'x' : number_format($penalty['betrag'], 2, ',', '.') . '€' ?>)
+                                            <?php if ($penalty['in_durchschnitt']): ?>
+                                                <span style="color:#4CAF50; margin-left:3px;" title="Fließt in die Durchschnittsberechnung ein">⚖️</span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </li>
                                 <?php endforeach; ?>
@@ -207,6 +229,11 @@ try {
                         </td>
                         <td style="font-weight: bold; color: #ff9900;">
                             <?= number_format($member['total_penalty'], 2, ',', '.') ?> €
+                            <?php if ($member['avg_penalty'] != $member['total_penalty']): ?>
+                                <span style="display:block; font-size:0.85em; color:#4CAF50;">
+                                    (Davon für Durchschnitt: <?= number_format($member['avg_penalty'], 2, ',', '.') ?> €)
+                                </span>
+                            <?php endif; ?>
                             <?php 
                             // Debug-Info: Zeige die Berechnung für jede Strafe
                             if (!empty($member['penalties'])):
@@ -215,9 +242,11 @@ try {
                                 <?php foreach ($member['penalties'] as $penalty): ?>
                                     <?php if ($penalty['istanzahl'] && $penalty['idstrafentyp'] > 0): ?>
                                         <?= $penalty['betrag'] ?> x <?= isset($penalty['preis']) ? $penalty['preis'] : '?' ?>€
-                                        = <?= $penalty['betrag'] * (isset($penalty['preis']) ? $penalty['preis'] : 0) ?>€<br>
+                                        = <?= $penalty['betrag'] * (isset($penalty['preis']) ? $penalty['preis'] : 0) ?>€
+                                        <?php if ($penalty['in_durchschnitt']): ?>⚖️<?php endif; ?><br>
                                     <?php elseif (!$penalty['istanzahl']): ?>
-                                        <?= number_format($penalty['betrag'], 2, ',', '.') ?>€<br>
+                                        <?= number_format($penalty['betrag'], 2, ',', '.') ?>€
+                                        <?php if ($penalty['in_durchschnitt']): ?>⚖️<?php endif; ?><br>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </small>
@@ -246,6 +275,13 @@ try {
                     <tr><td colspan="2">Keine nicht anwesenden Mitglieder.</td></tr>
                 <?php endif; ?>
             </table>
+        </div>
+
+        <div class="legend-container" style="margin-top:40px; background-color:#333; padding:15px; border-radius:5px; max-width:600px; margin-left:auto; margin-right:auto;">
+            <h3 style="margin-top:0;">Legende</h3>
+            <p><span style="color:#4CAF50;">⚖️</span> - Diese Strafe fließt in die Durchschnittsberechnung ein (in_durchschnitt = true)</p>
+            <p>Nicht anwesende Mitglieder bezahlen den Durchschnittsbetrag der anwesenden Mitglieder.</p>
+            <p>Der Durchschnitt berücksichtigt nur Strafen, bei denen "in_durchschnitt" aktiviert ist.</p>
         </div>
     <?php endif; ?>
 </body>

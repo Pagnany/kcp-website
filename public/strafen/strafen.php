@@ -23,8 +23,10 @@ $isLoggedIn = Auth::isLoggedIn();
     <?php if ($isLoggedIn): ?>
         <nav>
             <ul>
-                <li><a href="strafen-typ">Strafen Typ</a></li>
                 <li><a href="kegelstrafen">Kegelstrafen</a></li>
+                <li><a href="strafen-typ">Strafen Typ</a></li>
+                <li><a href="strafen-eintragen">Strafen aufschreiben</a></li>
+                <li><a href="strafe-betrag">Strafen Betrag</a></li>
             </ul>
         </nav>
     <?php endif; ?>

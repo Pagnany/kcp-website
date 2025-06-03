@@ -61,13 +61,18 @@ try {
                 strafen.idstrafentyp, 
                 strafen.grund, 
                 strafentyp.bezeichnung, 
-                strafentyp.preis 
+                strafentyp.preis,
+                strafen.istanzahl
             FROM strafen 
             LEFT JOIN strafentyp ON strafen.idstrafentyp = strafentyp.id 
             WHERE strafen.idveranstaltung = :event_id
         ");
         $stmt->execute([':event_id' => $selectedEvent]);
         $strafen = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($strafen as &$strafe) {
+            print_r($strafe);
+            echo '<br>';
+        }
     }
 } catch (PDOException $e) {
     echo 'Datenbankfehler: ' . htmlspecialchars($e->getMessage());
@@ -117,7 +122,18 @@ try {
                 <tr>
                     <th>Mitglied</th>
                     <?php foreach ($strafen as $strafe): ?>
-                        <th><?= htmlspecialchars($strafe['bezeichnung']) ?><br><span style="font-weight:normal;font-size:0.9em;">(<?= number_format($strafe['preis'], 2, ',', '.') ?> €)</span></th>
+                        <th>
+                            <?php if (isset($strafe['idstrafentyp']) && $strafe['idstrafentyp'] == 0): ?>
+                                <?= htmlspecialchars($strafe['grund']) ?>
+                            <?php else: ?>
+                                <?= htmlspecialchars($strafe['bezeichnung']) ?>
+                                <?php if (!empty($strafe['istanzahl']) && $strafe['istanzahl']): ?>
+                                    <br><span style="font-weight:normal;font-size:0.9em;">
+                                        (<?= number_format($strafe['preis'], 2, ',', '.') ?> €)
+                                    </span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </th>
                     <?php endforeach; ?>
                 </tr>
             </thead>

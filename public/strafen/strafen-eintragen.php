@@ -34,7 +34,7 @@ try {
     if (isset($_GET['event_id']) && isset($_GET['penalty_type_id'])) {
         $selectedEvent = $_GET['event_id'];
         $selectedPenaltyType = $_GET['penalty_type_id'];
-        $stmt = $conn->prepare("SELECT m.idmitglieder, m.nickname, m.vorname, m.nachname FROM mitglieder m JOIN anwesenheit a ON m.idmitglieder = a.id_mitglied WHERE a.id_veranstaltung = :event_id AND a.anwesend = 1 AND m.aktiv = true ORDER BY m.vorname, m.nachname");
+        $stmt = $conn->prepare("SELECT m.idmitglieder, m.nickname, m.vorname, m.nachname FROM mitglieder m JOIN anwesenheit a ON m.idmitglieder = a.id_mitglied WHERE a.id_veranstaltung = :event_id AND (a.anwesend = 1 OR a.spaeter = 1) AND m.aktiv = true ORDER BY m.vorname, m.nachname");
         $stmt->execute([':event_id' => $selectedEvent]);
         $members = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

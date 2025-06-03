@@ -26,7 +26,7 @@ try {
                 mitglieder.idmitglieder,
                 mitglieder.vorname, 
                 mitglieder.nachname, 
-                anwesenheit.anwesend 
+                anwesenheit.anwesend
             FROM anwesenheit
             LEFT JOIN mitglieder ON anwesenheit.id_mitglied = mitglieder.idmitglieder
             WHERE anwesenheit.id_veranstaltung = :event_id
@@ -34,6 +34,20 @@ try {
         ");
         $stmt->execute([':event_id' => $selectedEvent]);
         $anwesenheit = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        // Anwesenheit in anwesend/nicht anwesend aufteilen
+        $anwesende = [];
+        $nicht_anwesende = [];
+        if (!empty($anwesenheit)) {
+            foreach ($anwesenheit as $mitglied) {
+                if (!empty($mitglied['anwesend'])) {
+                    $anwesende[] = $mitglied;
+                } else {
+                    $nicht_anwesende[] = $mitglied;
+                }
+            }
+        }
 
         // alle Strafen für Mitglieder
         $stmt = $conn->prepare("
@@ -53,7 +67,9 @@ try {
             ORDER BY mitglieder.vorname, strafen.idstrafentyp DESC
         ");
         $stmt->execute([':event_id' => $selectedEvent]);
-        $strafen_mitglieder = $stmt->fetchAll(PDO::FETCH_ASSOC);        // Alle passierten Strafen
+        $strafen_mitglieder = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Alle passierten Strafen
         $stmt = $conn->prepare("
             SELECT DISTINCT 
                 strafen.idstrafentyp, 
@@ -125,20 +141,7 @@ try {
     </form>
     
     <?php if (!empty($anwesenheit) && !empty($strafen)): ?>
-        <?php 
-        // Anwesenheit in anwesend/nicht anwesend aufteilen
-        $anwesende = [];
-        $nicht_anwesende = [];
-        if (!empty($anwesenheit)) {
-            foreach ($anwesenheit as $mitglied) {
-                if (!empty($mitglied['anwesend'])) {
-                    $anwesende[] = $mitglied;
-                } else {
-                    $nicht_anwesende[] = $mitglied;
-                }
-            }
-        }
-        ?>        <?php if (!empty($anwesende) && !empty($strafen)): ?>
+        <?php if (!empty($anwesende) && !empty($strafen)): ?>
             <h2>Anwesende Mitglieder</h2>
             <table class="kegelstrafen-tabelle">
                 <thead>
@@ -159,7 +162,7 @@ try {
                                     <?php endif; ?>
                                 </th>
                             <?php endforeach; ?>
-                            <th style="background:rgb(110, 110, 110);">Zwischensumme</th>
+                            <th>Zwischensumme</th>
                         <?php endif; ?>
                         
                         <?php if (!empty($strafen_nicht_in_durchschnitt)): ?>
@@ -203,22 +206,25 @@ try {
                                                 $anzeige = '';
                                                 $istanzahl = false;
                                                 if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                    $anzeige = $sm['betrag'];
                                                     if ($sm['idstrafentyp'] == 0) {
                                                         if ($sm['grund'] === $strafe['grund']) {
                                                             if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                                $anzeige = $sm['betrag'];
                                                                 $betrag = $sm['betrag'] * $sm['preis'];
                                                                 $istanzahl = true;
                                                             } else {
+                                                                $anzeige = $sm['betrag'];
                                                                 $betrag = $sm['betrag'];
                                                             }
                                                             break;
                                                         }
                                                     } else {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
                                                         } else {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'];
                                                         }
                                                         break;
@@ -247,22 +253,25 @@ try {
                                                 $anzeige = '';
                                                 $istanzahl = false;
                                                 if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                    $anzeige = $sm['betrag'];
                                                     if ($sm['idstrafentyp'] == 0) {
                                                         if ($sm['grund'] === $strafe['grund']) {
                                                             if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                                $anzeige = $sm['betrag'];
                                                                 $betrag = $sm['betrag'] * $sm['preis'];
                                                                 $istanzahl = true;
                                                             } else {
+                                                                $anzeige = $sm['betrag'];
                                                                 $betrag = $sm['betrag'];
                                                             }
                                                             break;
                                                         }
                                                     } else {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
                                                         } else {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'];
                                                         }
                                                         break;
@@ -374,7 +383,7 @@ try {
                 }
             }
         }
-        ?>        <?php if (!empty($nicht_anwesende) && (!empty($strafen_in_durchschnitt_nicht_anwesende) || !empty($strafen_nicht_in_durchschnitt_nicht_anwesende))) { ?>
+        ?>        <?php if (!empty($nicht_anwesende)) { ?>
             <h2>Nicht anwesende Mitglieder</h2>
             <table class="kegelstrafen-tabelle">
                 <thead>
@@ -432,22 +441,25 @@ try {
                                             $anzeige = '';
                                             $istanzahl = false;
                                             if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                $anzeige = $sm['betrag'];
                                                 if ($sm['idstrafentyp'] == 0) {
                                                     if ($sm['grund'] === $strafe['grund']) {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
                                                         } else {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'];
                                                         }
                                                         break;
                                                     }
                                                 } else {
                                                     if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $anzeige = $sm['betrag'];
                                                         $betrag = $sm['betrag'] * $sm['preis'];
                                                         $istanzahl = true;
                                                     } else {
+                                                        $anzeige = $sm['betrag'];
                                                         $betrag = $sm['betrag'];
                                                     }
                                                     break;
@@ -472,22 +484,25 @@ try {
                                             $anzeige = '';
                                             $istanzahl = false;
                                             if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                $anzeige = $sm['betrag'];
                                                 if ($sm['idstrafentyp'] == 0) {
                                                     if ($sm['grund'] === $strafe['grund']) {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
                                                         } else {
+                                                            $anzeige = $sm['betrag'];
                                                             $betrag = $sm['betrag'];
                                                         }
                                                         break;
                                                     }
                                                 } else {
                                                     if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $anzeige = $sm['betrag'];
                                                         $betrag = $sm['betrag'] * $sm['preis'];
                                                         $istanzahl = true;
                                                     } else {
+                                                        $anzeige = $sm['betrag'];
                                                         $betrag = $sm['betrag'];
                                                     }
                                                     break;

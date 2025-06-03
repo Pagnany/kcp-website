@@ -44,14 +44,17 @@ try {
                 $stmt->execute([':event_id' => $eventId]);
 
                 // Insert new attendance records
-                $stmt = $conn->prepare("INSERT INTO anwesenheit (id_veranstaltung, id_mitglied, anwesend) VALUES (:event_id, :member_id, :attendance)");
+                $stmt = $conn->prepare("INSERT INTO anwesenheit (id_veranstaltung, id_mitglied, anwesend, spaeter) VALUES (:event_id, :member_id, :attendance, :spaeter)");
                 
                 foreach ($attendanceData as $memberId => $status) {
                     if ($status !== '') { // Only insert if a status was selected
+                        $anwesend = $status === 'true' ? 1 : ($status === 'spaeter' ? 0 : 0);
+                        $spaeter = $status === 'spaeter' ? 1 : 0;
                         $stmt->execute([
                             ':event_id' => $eventId,
                             ':member_id' => $memberId,
-                            ':attendance' => $status === 'true' ? 1 : 0
+                            ':attendance' => $anwesend,
+                            ':spaeter' => $spaeter
                         ]);
                     }
                 }
@@ -70,9 +73,14 @@ try {
     // If an event is selected, fetch its attendance data
     if (isset($_GET['event_id'])) {
         $selectedEvent = $_GET['event_id'];
-        $stmt = $conn->prepare("SELECT id_mitglied, anwesend FROM anwesenheit WHERE id_veranstaltung = :event_id");
+        $stmt = $conn->prepare("SELECT id_mitglied, anwesend, spaeter FROM anwesenheit WHERE id_veranstaltung = :event_id");
         $stmt->execute([':event_id' => $selectedEvent]);
-        $attendance = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $attendance = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $attendanceById = [];
+        foreach ($attendance as $row) {
+            $attendanceById[$row['id_mitglied']] = $row;
+        }
+        $attendance = $attendanceById;
     }
 } catch (\PDOException $e) {
     $error = "Datenbankfehler: " . $e->getMessage();
@@ -140,12 +148,17 @@ try {
                             <div class="attendance-options">
                                 <label>
                                     <input type="radio" name="attendance[<?= $member['idmitglieder'] ?>]" value="true"
-                                        <?= isset($attendance[$member['idmitglieder']]) && $attendance[$member['idmitglieder']] == 1 ? 'checked' : '' ?>>
+                                        <?= isset($attendance[$member['idmitglieder']]) && $attendance[$member['idmitglieder']]['anwesend'] == 1 && $attendance[$member['idmitglieder']]['spaeter'] == 0 ? 'checked' : '' ?>>
                                     Anwesend
                                 </label>
                                 <label>
+                                    <input type="radio" name="attendance[<?= $member['idmitglieder'] ?>]" value="spaeter"
+                                        <?= isset($attendance[$member['idmitglieder']]) && $attendance[$member['idmitglieder']]['spaeter'] == 1 ? 'checked' : '' ?>>
+                                    Kommt später
+                                </label>
+                                <label>
                                     <input type="radio" name="attendance[<?= $member['idmitglieder'] ?>]" value="false"
-                                        <?= isset($attendance[$member['idmitglieder']]) && $attendance[$member['idmitglieder']] == 0 ? 'checked' : '' ?>>
+                                        <?= isset($attendance[$member['idmitglieder']]) && $attendance[$member['idmitglieder']]['anwesend'] == 0 && $attendance[$member['idmitglieder']]['spaeter'] == 0 ? 'checked' : '' ?>>
                                     Nicht anwesend
                                 </label>
                                 <label>
@@ -206,4 +219,4 @@ try {
         }
     </style>
 </body>
-</html> 
+</html>

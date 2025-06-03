@@ -409,8 +409,9 @@ try {
                                 </th>
                             <?php }
                         }
-                        echo '<th>Gesamtsumme</th><th>Durchschnitt (Anwesende)</th>';
                         ?>
+                        <th>Durchschnitt (Anwesende)</th>
+                        <th>Gesamtsumme</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -500,9 +501,9 @@ try {
                                     echo '<td>' . ($anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-') . '</td>';
                                 }
                             }
-                            $mitglied_gesamt = $mitglied_durchschnitt_summe + $mitglied_normal_summe;
-                            echo '<td><strong>' . number_format($mitglied_gesamt, 2, ',', '.') . ' €</strong></td>';
+                            $mitglied_gesamt = $mitglied_durchschnitt_summe + $mitglied_normal_summe + $durchschnitt_zwischensumme;
                             echo '<td>' . number_format($durchschnitt_zwischensumme, 2, ',', '.') . ' €</td>';
+                            echo '<td><strong>' . number_format($mitglied_gesamt, 2, ',', '.') . ' €</strong></td>';
                             ?>
                         </tr>
                     <?php } ?>

@@ -71,35 +71,26 @@ try {
             // Summe der Strafen für dieses Mitglied berechnen
             $totalPenalty = 0;
             $avgPenalty = 0; // Summe der Strafen, die in den Durchschnitt einfließen
+            $ownPenalty = 0; // Summe der eigenen Strafen (für abwesende Mitglieder)
             
             foreach ($member['penalties'] as $penalty) {
                 $strafBetrag = 0;
                 
                 if ($penalty['istanzahl']) {
-                    // Bei Anzahl (istanzahl = 1) den Strafentyp-Preis mit der Anzahl multiplizieren
                     $anzahl = intval($penalty['betrag']);
-                    
-                    // Wenn es ein Strafentyp ist, verwenden wir den Preis aus der Join-Abfrage
                     if ($penalty['idstrafentyp'] > 0 && isset($penalty['preis'])) {
-                        // Preis direkt aus dem Join verwenden
                         $preis = floatval($penalty['preis']);
                         $strafBetrag = $anzahl * $preis;
                         $totalPenalty += $strafBetrag;
-                        
-                        // Nur wenn in_durchschnitt gesetzt ist, zur Durchschnittsumme addieren
+                        $ownPenalty += $strafBetrag;
                         if ($penalty['in_durchschnitt']) {
                             $avgPenalty += $strafBetrag;
                         }
-                    } else {
-                        // Bei individuellen Strafen mit istanzahl ohne Preis
-                        // Nur als Information anzeigen, kein Betrag zur Summe hinzufügen
                     }
                 } else {
-                    // Bei Geldbeträgen (istanzahl = 0) direkt den Betrag addieren
                     $strafBetrag = floatval($penalty['betrag']);
                     $totalPenalty += $strafBetrag;
-                    
-                    // Nur wenn in_durchschnitt gesetzt ist, zur Durchschnittsumme addieren
+                    $ownPenalty += $strafBetrag;
                     if ($penalty['in_durchschnitt']) {
                         $avgPenalty += $strafBetrag;
                     }
@@ -107,6 +98,8 @@ try {
             }
             $member['total_penalty'] = $totalPenalty;
             $member['avg_penalty'] = $avgPenalty; // Strafen für Durchschnittsberechnung
+            $member['own_penalty'] = $ownPenalty; // Eigene Strafen (für abwesende Mitglieder)
+            $member['absent_total'] = $ownPenalty + $averagePenalty; // Für abwesende: eigene Strafen + Durchschnitt
             
             if (isset($attendance[$id]) && $attendance[$id] == 1) {
                 $presentMembers[] = $member;
@@ -262,17 +255,46 @@ try {
         <div class="penalties-container" style="margin-top:40px;">
             <h2>Nicht anwesende Mitglieder (müssen Durchschnitt bezahlen)</h2>
             <table class="members-list">
-                <tr><th>Vorname</th><th>Durchschnittsstrafe</th></tr>
-                <?php foreach ($absentMembers as $member): ?>
+                <tr><th>Vorname</th><th>Strafen</th><th>Summe</th></tr>
+                <?php foreach (
+                    $absentMembers as $member): ?>
                     <tr>
                         <td><?= htmlspecialchars($member['vorname']) ?></td>
+                        <td>
+                            <?php if (!empty($member['penalties'])): ?>
+                                <ul style="list-style:none; margin:0; padding:0;">
+                                <?php foreach ($member['penalties'] as $penalty): ?>
+                                    <li>
+                                        <?php if ($penalty['idstrafentyp'] > 0): ?>
+                                            <?= htmlspecialchars($penalty['strafentyp_bezeichnung']) ?>
+                                            (<?= $penalty['istanzahl'] ? $penalty['betrag'] . 'x' : number_format($penalty['betrag'], 2, ',', '.') . '€' ?>)
+                                            <?php if ($penalty['in_durchschnitt']): ?>
+                                                <span style="color:#4CAF50; margin-left:3px;" title="Fließt in die Durchschnittsberechnung ein">⚖️</span>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <?= htmlspecialchars($penalty['grund']) ?>
+                                            (<?= $penalty['istanzahl'] ? $penalty['betrag'] . 'x' : number_format($penalty['betrag'], 2, ',', '.') . '€' ?>)
+                                            <?php if ($penalty['in_durchschnitt']): ?>
+                                                <span style="color:#4CAF50; margin-left:3px;" title="Fließt in die Durchschnittsberechnung ein">⚖️</span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                                </ul>
+                            <?php else: ?>
+                                Keine Strafen
+                            <?php endif; ?>
+                        </td>
                         <td style="font-weight: bold; color: #ff4400;">
-                            <?= number_format($averagePenalty, 2, ',', '.') ?> €
+                            <?= number_format($member['absent_total'], 2, ',', '.') ?> €
+                            <span style="display:block; font-size:0.85em; color:#4CAF50;">
+                                (Durchschnitt: <?= number_format($averagePenalty, 2, ',', '.') ?> €<?php if ($member['own_penalty'] > 0): ?> + Eigene: <?= number_format($member['own_penalty'], 2, ',', '.') ?> €<?php endif; ?>)
+                            </span>
                         </td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (empty($absentMembers)): ?>
-                    <tr><td colspan="2">Keine nicht anwesenden Mitglieder.</td></tr>
+                    <tr><td colspan="3">Keine nicht anwesenden Mitglieder.</td></tr>
                 <?php endif; ?>
             </table>
         </div>

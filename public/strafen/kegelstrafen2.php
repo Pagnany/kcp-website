@@ -296,7 +296,7 @@ try {
                         <?php $gesamt_summe += $mitglied_gesamt; ?>
                     <?php endforeach; ?>
                       <tr style="background:rgb(110, 110, 110);font-weight:bold;">
-                        <td>Summe aller Anwesenden</td>
+                        <td>Summe</td>
                         <?php 
                         if (!empty($strafen_in_durchschnitt)) {
                             for ($i = 0; $i < count($strafen_in_durchschnitt); $i++) {
@@ -496,7 +496,7 @@ try {
                         <?php $gesamt_summe_später += $mitglied_gesamt; ?>
                     <?php endforeach; ?>
                       <tr style="background:rgb(110, 110, 110);font-weight:bold;">
-                        <td>Summe aller Später</td>
+                        <td>Summe</td>
                         <?php 
                         if (!empty($strafen_in_durchschnitt)) {
                             for ($i = 0; $i < count($strafen_in_durchschnitt); $i++) {
@@ -810,7 +810,7 @@ try {
                     $spalten += 1;
                     ?>
                     <tr style="background:rgb(110, 110, 110);font-weight:bold;">
-                        <td colspan="<?= $spalten ?>" style="text-align:right;">Summe aller Nicht-Anwesenden</td>
+                        <td colspan="<?= $spalten ?>" style="text-align:left;">Summe</td>
                         <td><strong><?= number_format($gesamt_summe_nicht_anwesende, 2, ',', '.') ?> €</strong></td>
                     </tr>
                 </tbody>

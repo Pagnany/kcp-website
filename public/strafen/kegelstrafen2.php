@@ -25,7 +25,20 @@ try {
     
     // Wenn eine Veranstaltung ausgewählt wurde
     if ($selectedEvent) {
-        echo "<h2>Strafen für Veranstaltung: " . htmlspecialchars($selectedEvent) . "</h2>";
+        // Anwesenheit Mitglieder
+        $stmt = $conn->prepare("
+            SELECT 
+                mitglieder.idmitglieder, 
+                mitglieder.vorname, 
+                mitglieder.nachname, 
+                anwesenheit.anwesend 
+            FROM anwesenheit
+            LEFT JOIN mitglieder ON anwesenheit.id_mitglied = mitglieder.idmitglieder
+            WHERE anwesenheit.id_veranstaltung = :event_id
+            ORDER BY mitglieder.vorname
+        ");
+        $stmt->execute([':event_id' => $selectedEvent]);
+        $anwesenheit = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // alle Strafen für Mitglieder
         $stmt = $conn->prepare("

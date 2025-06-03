@@ -283,14 +283,35 @@ try {
                         </tr>
                         <?php $gesamt_summe += $mitglied_gesamt; ?>
                     <?php endforeach; ?>
-                    
-                    <tr style="background:rgb(110, 110, 110);font-weight:bold;">
+                      <tr style="background:rgb(110, 110, 110);font-weight:bold;">
                         <td>Summe aller Anwesenden</td>
-                        <?php if (!empty($strafen_in_durchschnitt)): ?>
+                        <?php 
+                        $zwischensumme_gesamt = 0;
+                        if (!empty($strafen_in_durchschnitt)): ?>
                             <?php for ($i = 0; $i < count($strafen_in_durchschnitt); $i++): ?>
                                 <td></td>
                             <?php endfor; ?>
-                            <td></td>
+                            <?php
+                            // Berechnung der gesamten Zwischensumme
+                            foreach ($anwesende as $mitglied) {
+                                $mitglied_summe = 0;
+                                foreach ($strafen_mitglieder as $sm) {
+                                    if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && !empty($sm['in_durchschnitt'])) {
+                                        $betrag = 0;
+                                        if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                            $betrag = $sm['betrag'] * $sm['preis'];
+                                        } else {
+                                            $betrag = $sm['betrag'];
+                                        }
+                                        if (is_numeric($betrag)) {
+                                            $mitglied_summe += $betrag;
+                                        }
+                                    }
+                                }
+                                $zwischensumme_gesamt += $mitglied_summe;
+                            }
+                            ?>
+                            <td><strong><?= number_format($zwischensumme_gesamt, 2, ',', '.') ?> €</strong></td>
                         <?php endif; ?>
                         <?php if (!empty($strafen_nicht_in_durchschnitt)): ?>
                             <?php for ($i = 0; $i < count($strafen_nicht_in_durchschnitt); $i++): ?>

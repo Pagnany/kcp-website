@@ -66,13 +66,10 @@ try {
             FROM strafen 
             LEFT JOIN strafentyp ON strafen.idstrafentyp = strafentyp.id 
             WHERE strafen.idveranstaltung = :event_id
+            ORDER BY strafen.idstrafentyp DESC
         ");
         $stmt->execute([':event_id' => $selectedEvent]);
         $strafen = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($strafen as &$strafe) {
-            print_r($strafe);
-            echo '<br>';
-        }
     }
 } catch (PDOException $e) {
     echo 'Datenbankfehler: ' . htmlspecialchars($e->getMessage());
@@ -147,8 +144,16 @@ try {
                                 if (!empty($strafen_mitglieder)) {
                                     foreach ($strafen_mitglieder as $sm) {
                                         if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                            $betrag = $sm['betrag'];
-                                            break;
+                                            // Bei idstrafentyp = 0 auch den Grund vergleichen
+                                            if ($sm['idstrafentyp'] == 0) {
+                                                if ($sm['grund'] === $strafe['grund']) {
+                                                    $betrag = $sm['betrag'];
+                                                    break;
+                                                }
+                                            } else {
+                                                $betrag = $sm['betrag'];
+                                                break;
+                                            }
                                         }
                                     }
                                 }

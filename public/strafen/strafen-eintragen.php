@@ -147,7 +147,7 @@ try {
                                 <input type="number" name="penalties[<?= $member['idmitglieder'] ?>]" min="0" value="0" style="width:60px;">
                                 <span>Anzahl</span>
                                 <label style="margin-left:20px;">
-                                    <input type="checkbox" name="in_durchschnitt[<?= $member['idmitglieder'] ?>]" value="1">
+                                    <input type="checkbox" name="in_durchschnitt[<?= $member['idmitglieder'] ?>]" value="1" checked>
                                     In Durchschnitt
                                 </label>
                             </div>

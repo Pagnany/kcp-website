@@ -4,11 +4,6 @@ require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 use Pagnany\Kcp\DatabaseConnect;
 
 $events = [];
-$presentMembers = [];
-$absentMembers = [];
-$selectedEvent = null;
-$penaltyTypes = [];
-$memberPenalties = []; // Array für Strafen pro Mitglied
 
 // Veranstaltung aus GET-Parameter auslesen
 if (isset($_GET['event_id']) && !empty($_GET['event_id'])) {
@@ -28,7 +23,7 @@ try {
         // Anwesenheit Mitglieder
         $stmt = $conn->prepare("
             SELECT 
-                mitglieder.idmitglieder, 
+                mitglieder.idmitglieder,
                 mitglieder.vorname, 
                 mitglieder.nachname, 
                 anwesenheit.anwesend 
@@ -43,7 +38,8 @@ try {
         // alle Strafen für Mitglieder
         $stmt = $conn->prepare("
             SELECT 
-                mitglieder.vorname, 
+                mitglieder.idmitglieder,
+                strafen.idstrafentyp,
                 strafen.betrag, 
                 strafen.grund, 
                 strafen.istanzahl, 
@@ -84,6 +80,16 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/public/style.css">
     <title>KCP - Kegelstrafen</title>
+    <style>
+        .kegelstrafen-tabelle th, .kegelstrafen-tabelle td {
+            border: 1px solid #888;
+            text-align: center;
+            padding: 6px 8px;
+        }
+        .kegelstrafen-tabelle th {
+            background:rgb(110, 110, 110);
+        }
+    </style>
 </head>
 <body>
     <header class="site-header">
@@ -104,6 +110,40 @@ try {
             <button type="submit" class="submit-button">Laden</button>
         </div>
     </form>
+    
+    <?php if (!empty($anwesenheit) && !empty($strafen)): ?>
+        <table class="kegelstrafen-tabelle">
+            <thead>
+                <tr>
+                    <th>Mitglied</th>
+                    <?php foreach ($strafen as $strafe): ?>
+                        <th><?= htmlspecialchars($strafe['bezeichnung']) ?><br><span style="font-weight:normal;font-size:0.9em;">(<?= number_format($strafe['preis'], 2, ',', '.') ?> €)</span></th>
+                    <?php endforeach; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($anwesenheit as $mitglied): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($mitglied['vorname']) ?></td>
+                        <?php foreach ($strafen as $strafe): ?>
+                            <?php
+                                $betrag = '';
+                                if (!empty($strafen_mitglieder)) {
+                                    foreach ($strafen_mitglieder as $sm) {
+                                        if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
+                                            $betrag = $sm['betrag'];
+                                            break;
+                                        }
+                                    }
+                                }
+                            ?>
+                            <td><?= $betrag !== '' ? htmlspecialchars($betrag) : '-' ?></td>
+                        <?php endforeach; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 </body>
 </html>
 <!--

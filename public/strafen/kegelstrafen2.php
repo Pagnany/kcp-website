@@ -182,7 +182,7 @@ try {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $gesamt_summe = 0; ?>
+                    <?php $gesamt_summe = 0; $zwischensumme_gesamt = 0; $anzahl_anwesende = count($anwesende); ?>
                     <?php foreach ($anwesende as $mitglied): ?>
                         <tr>
                             <td><?= htmlspecialchars($mitglied['vorname']) ?></td>
@@ -286,12 +286,10 @@ try {
                       <tr style="background:rgb(110, 110, 110);font-weight:bold;">
                         <td>Summe aller Anwesenden</td>
                         <?php 
-                        $zwischensumme_gesamt = 0;
-                        if (!empty($strafen_in_durchschnitt)): ?>
-                            <?php for ($i = 0; $i < count($strafen_in_durchschnitt); $i++): ?>
-                                <td></td>
-                            <?php endfor; ?>
-                            <?php
+                        if (!empty($strafen_in_durchschnitt)) {
+                            for ($i = 0; $i < count($strafen_in_durchschnitt); $i++) {
+                                echo '<td></td>';
+                            }
                             // Berechnung der gesamten Zwischensumme
                             foreach ($anwesende as $mitglied) {
                                 $mitglied_summe = 0;
@@ -310,15 +308,17 @@ try {
                                 }
                                 $zwischensumme_gesamt += $mitglied_summe;
                             }
-                            ?>
-                            <td><strong><?= number_format($zwischensumme_gesamt, 2, ',', '.') ?> €</strong></td>
-                        <?php endif; ?>
-                        <?php if (!empty($strafen_nicht_in_durchschnitt)): ?>
-                            <?php for ($i = 0; $i < count($strafen_nicht_in_durchschnitt); $i++): ?>
-                                <td></td>
-                            <?php endfor; ?>
-                        <?php endif; ?>
-                        <td><?= number_format($gesamt_summe, 2, ',', '.') ?> €</td>
+                            echo '<td><strong>' . number_format($zwischensumme_gesamt, 2, ',', '.') . " €</strong></td>";
+                        }
+                        if (!empty($strafen_nicht_in_durchschnitt)) {
+                            for ($i = 0; $i < count($strafen_nicht_in_durchschnitt); $i++) {
+                                echo '<td></td>';
+                            }
+                        }
+                        echo '<td>' . number_format($gesamt_summe, 2, ',', '.') . " €</td>";
+                        // Durchschnitt berechnen
+                        $durchschnitt_zwischensumme = $anzahl_anwesende > 0 ? $zwischensumme_gesamt / $anzahl_anwesende : 0;
+                        ?>
                     </tr>
                 </tbody>
             </table>
@@ -374,82 +374,66 @@ try {
                 }
             }
         }
-        ?>        <?php if (!empty($nicht_anwesende) && (!empty($strafen_in_durchschnitt_nicht_anwesende) || !empty($strafen_nicht_in_durchschnitt_nicht_anwesende))): ?>
+        ?>        <?php if (!empty($nicht_anwesende) && (!empty($strafen_in_durchschnitt_nicht_anwesende) || !empty($strafen_nicht_in_durchschnitt_nicht_anwesende))) { ?>
             <h2>Nicht anwesende Mitglieder</h2>
             <table class="kegelstrafen-tabelle">
                 <thead>
                     <tr>
                         <th>Mitglied</th>
-                        <?php if (!empty($strafen_in_durchschnitt_nicht_anwesende)): ?>
-                            <?php foreach ($strafen_in_durchschnitt_nicht_anwesende as $strafe): ?>
+                        <?php if (!empty($strafen_in_durchschnitt_nicht_anwesende)) {
+                            foreach ($strafen_in_durchschnitt_nicht_anwesende as $strafe) { ?>
                                 <th>
-                                    <?php if (isset($strafe['idstrafentyp']) && $strafe['idstrafentyp'] == 0): ?>
-                                        <?= htmlspecialchars($strafe['grund']) ?>
-                                    <?php else: ?>
-                                        <?= htmlspecialchars($strafe['bezeichnung']) ?>
-                                        <?php if (!empty($strafe['istanzahl']) && $strafe['istanzahl']): ?>
-                                            <br><span style="font-weight:normal;font-size:0.9em;">
-                                                (<?= number_format($strafe['preis'], 2, ',', '.') ?> €)
-                                            </span>
-                                        <?php endif; ?>
-                                    <?php endif; ?>
+                                    <?php if (isset($strafe['idstrafentyp']) && $strafe['idstrafentyp'] == 0) {
+                                        echo htmlspecialchars($strafe['grund']);
+                                } else {
+                                    echo htmlspecialchars($strafe['bezeichnung']);
+                                    if (!empty($strafe['istanzahl']) && $strafe['istanzahl']) {
+                                        echo '<br><span style="font-weight:normal;font-size:0.9em;">(' . number_format($strafe['preis'], 2, ',', '.') . ' €)</span>';
+                                    }
+                                } ?>
                                 </th>
-                            <?php endforeach; ?>
-                            <th style="background:#8a8a8a;">Zwischensumme</th>
-                        <?php endif; ?>
-                        
-                        <?php if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)): ?>
-                            <?php foreach ($strafen_nicht_in_durchschnitt_nicht_anwesende as $strafe): ?>
+                            <?php }
+                            echo '<th style="background:#8a8a8a;">Zwischensumme</th>';
+                        }
+                        if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)) {
+                            foreach ($strafen_nicht_in_durchschnitt_nicht_anwesende as $strafe) { ?>
                                 <th>
-                                    <?php if (isset($strafe['idstrafentyp']) && $strafe['idstrafentyp'] == 0): ?>
-                                        <?= htmlspecialchars($strafe['grund']) ?>
-                                    <?php else: ?>
-                                        <?= htmlspecialchars($strafe['bezeichnung']) ?>
-                                        <?php if (!empty($strafe['istanzahl']) && $strafe['istanzahl']): ?>
-                                            <br><span style="font-weight:normal;font-size:0.9em;">
-                                                (<?= number_format($strafe['preis'], 2, ',', '.') ?> €)
-                                            </span>
-                                        <?php endif; ?>
-                                    <?php endif; ?>
+                                    <?php if (isset($strafe['idstrafentyp']) && $strafe['idstrafentyp'] == 0) {
+                                        echo htmlspecialchars($strafe['grund']);
+                                } else {
+                                    echo htmlspecialchars($strafe['bezeichnung']);
+                                    if (!empty($strafe['istanzahl']) && $strafe['istanzahl']) {
+                                        echo '<br><span style="font-weight:normal;font-size:0.9em;">(' . number_format($strafe['preis'], 2, ',', '.') . ' €)</span>';
+                                    }
+                                } ?>
                                 </th>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                        <th>Gesamtsumme</th>
+                            <?php }
+                        }
+                        echo '<th>Gesamtsumme</th><th>Durchschnitt (Anwesende)</th>';
+                        ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($nicht_anwesende as $mitglied): ?>
+                    <?php foreach ($nicht_anwesende as $mitglied) { ?>
                         <tr>
                             <td><?= htmlspecialchars($mitglied['vorname']) ?></td>
                             <?php 
                                 $mitglied_durchschnitt_summe = 0;
                                 $mitglied_normal_summe = 0;
                             ?>
-                            
-                            <?php // Strafen mit in_durchschnitt anzeigen ?>
-                            <?php if (!empty($strafen_in_durchschnitt_nicht_anwesende)): ?>
-                                <?php foreach ($strafen_in_durchschnitt_nicht_anwesende as $strafe): ?>
-                                    <?php
-                                        $betrag = '';
-                                        $anzeige = '';
-                                        $istanzahl = false;
-                                        if (!empty($strafen_mitglieder)) {
-                                            foreach ($strafen_mitglieder as $sm) {
-                                                $anzeige = '';
-                                                $istanzahl = false;
-                                                if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                    $anzeige = $sm['betrag'];
-                                                    if ($sm['idstrafentyp'] == 0) {
-                                                        if ($sm['grund'] === $strafe['grund']) {
-                                                            if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
-                                                                $betrag = $sm['betrag'] * $sm['preis'];
-                                                                $istanzahl = true;
-                                                            } else {
-                                                                $betrag = $sm['betrag'];
-                                                            }
-                                                            break;
-                                                        }
-                                                    } else {
+                            <?php if (!empty($strafen_in_durchschnitt_nicht_anwesende)) {
+                                foreach ($strafen_in_durchschnitt_nicht_anwesende as $strafe) {
+                                    $betrag = '';
+                                    $anzeige = '';
+                                    $istanzahl = false;
+                                    if (!empty($strafen_mitglieder)) {
+                                        foreach ($strafen_mitglieder as $sm) {
+                                            $anzeige = '';
+                                            $istanzahl = false;
+                                            if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
+                                                $anzeige = $sm['betrag'];
+                                                if ($sm['idstrafentyp'] == 0) {
+                                                    if ($sm['grund'] === $strafe['grund']) {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
@@ -458,42 +442,38 @@ try {
                                                         }
                                                         break;
                                                     }
+                                                } else {
+                                                    if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $betrag = $sm['betrag'] * $sm['preis'];
+                                                        $istanzahl = true;
+                                                    } else {
+                                                        $betrag = $sm['betrag'];
+                                                    }
+                                                    break;
                                                 }
                                             }
                                         }
-                                        if ($betrag !== '' && is_numeric($betrag)) {
-                                            $mitglied_durchschnitt_summe += $betrag;
-                                        }
-                                    ?>
-                                    <td><?= $anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-' ?></td>
-                                <?php endforeach; ?>
-                                <td style="background:#e0e0e0;"><strong><?= number_format($mitglied_durchschnitt_summe, 2, ',', '.') ?> €</strong></td>
-                            <?php endif; ?>
-                            
-                            <?php // Strafen ohne in_durchschnitt anzeigen ?>
-                            <?php if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)): ?>
-                                <?php foreach ($strafen_nicht_in_durchschnitt_nicht_anwesende as $strafe): ?>
-                                    <?php
-                                        $betrag = '';
-                                        $anzeige = '';
-                                        $istanzahl = false;
-                                        if (!empty($strafen_mitglieder)) {
-                                            foreach ($strafen_mitglieder as $sm) {
-                                                $anzeige = '';
-                                                $istanzahl = false;
-                                                if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
-                                                    $anzeige = $sm['betrag'];
-                                                    if ($sm['idstrafentyp'] == 0) {
-                                                        if ($sm['grund'] === $strafe['grund']) {
-                                                            if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
-                                                                $betrag = $sm['betrag'] * $sm['preis'];
-                                                                $istanzahl = true;
-                                                            } else {
-                                                                $betrag = $sm['betrag'];
-                                                            }
-                                                            break;
-                                                        }
-                                                    } else {
+                                    }
+                                    if ($betrag !== '' && is_numeric($betrag)) {
+                                        $mitglied_durchschnitt_summe += $betrag;
+                                    }
+                                    echo '<td>' . ($anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-') . '</td>';
+                                }
+                                echo '<td style="background:#e0e0e0;"><strong>' . number_format($mitglied_durchschnitt_summe, 2, ',', '.') . ' €</strong></td>';
+                            }
+                            if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)) {
+                                foreach ($strafen_nicht_in_durchschnitt_nicht_anwesende as $strafe) {
+                                    $betrag = '';
+                                    $anzeige = '';
+                                    $istanzahl = false;
+                                    if (!empty($strafen_mitglieder)) {
+                                        foreach ($strafen_mitglieder as $sm) {
+                                            $anzeige = '';
+                                            $istanzahl = false;
+                                            if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
+                                                $anzeige = $sm['betrag'];
+                                                if ($sm['idstrafentyp'] == 0) {
+                                                    if ($sm['grund'] === $strafe['grund']) {
                                                         if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
                                                             $betrag = $sm['betrag'] * $sm['preis'];
                                                             $istanzahl = true;
@@ -502,24 +482,33 @@ try {
                                                         }
                                                         break;
                                                     }
+                                                } else {
+                                                    if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $betrag = $sm['betrag'] * $sm['preis'];
+                                                        $istanzahl = true;
+                                                    } else {
+                                                        $betrag = $sm['betrag'];
+                                                    }
+                                                    break;
                                                 }
                                             }
                                         }
-                                        if ($betrag !== '' && is_numeric($betrag)) {
-                                            $mitglied_normal_summe += $betrag;
-                                        }
-                                    ?>
-                                    <td><?= $anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-' ?></td>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                            
-                            <?php $mitglied_gesamt = $mitglied_durchschnitt_summe + $mitglied_normal_summe; ?>
-                            <td><strong><?= number_format($mitglied_gesamt, 2, ',', '.') ?> €</strong></td>
+                                    }
+                                    if ($betrag !== '' && is_numeric($betrag)) {
+                                        $mitglied_normal_summe += $betrag;
+                                    }
+                                    echo '<td>' . ($anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-') . '</td>';
+                                }
+                            }
+                            $mitglied_gesamt = $mitglied_durchschnitt_summe + $mitglied_normal_summe;
+                            echo '<td><strong>' . number_format($mitglied_gesamt, 2, ',', '.') . ' €</strong></td>';
+                            echo '<td>' . number_format($durchschnitt_zwischensumme, 2, ',', '.') . ' €</td>';
+                            ?>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </tbody>
             </table>
-        <?php endif; ?>
+        <?php } ?>
     <?php endif; ?>
 </body>
 </html>

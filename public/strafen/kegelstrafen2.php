@@ -132,34 +132,57 @@ try {
                             <?php endif; ?>
                         </th>
                     <?php endforeach; ?>
+                    <th>Summe</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($anwesenheit as $mitglied): ?>
                     <tr>
                         <td><?= htmlspecialchars($mitglied['vorname']) ?></td>
+                        <?php 
+                            $mitglied_summe = 0;
+                        ?>
                         <?php foreach ($strafen as $strafe): ?>
                             <?php
                                 $betrag = '';
+                                $anzeige = '';
                                 if (!empty($strafen_mitglieder)) {
                                     foreach ($strafen_mitglieder as $sm) {
+                                        $anzeige = '';
+                                        $istanzahl = false;
                                         if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
                                             // Bei idstrafentyp = 0 auch den Grund vergleichen
+                                            $anzeige = $sm['betrag'];
                                             if ($sm['idstrafentyp'] == 0) {
                                                 if ($sm['grund'] === $strafe['grund']) {
-                                                    $betrag = $sm['betrag'];
+                                                    // Prüfen, ob istanzahl gesetzt ist
+                                                    if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $betrag = $sm['betrag'] * $sm['preis'];
+                                                        $istanzahl = true;
+                                                    } else {
+                                                        $betrag = $sm['betrag'];
+                                                    }
                                                     break;
                                                 }
                                             } else {
-                                                $betrag = $sm['betrag'];
+                                                if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                    $betrag = $sm['betrag'] * $sm['preis'];
+                                                    $istanzahl = true;
+                                                } else {
+                                                    $betrag = $sm['betrag'];
+                                                }
                                                 break;
                                             }
                                         }
                                     }
                                 }
+                                if ($betrag !== '' && is_numeric($betrag)) {
+                                    $mitglied_summe += $betrag;
+                                }
                             ?>
-                            <td><?= $betrag !== '' ? htmlspecialchars($betrag) : '-' ?></td>
+                            <td><?= $anzeige !== '' ? htmlspecialchars($anzeige) . (!$istanzahl ? ' €' : '') : '-' ?></td>
                         <?php endforeach; ?>
+                        <td><strong><?= number_format($mitglied_summe, 2, ',', '.') ?> €</strong></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -507,6 +507,92 @@ try {
                             ?>
                         </tr>
                     <?php } ?>
+                    <?php 
+                    // Gesamtsumme für nicht anwesende Mitglieder berechnen
+                    $gesamt_summe_nicht_anwesende = 0;
+                    foreach ($nicht_anwesende as $mitglied) {
+                        $mitglied_durchschnitt_summe = 0;
+                        $mitglied_normal_summe = 0;
+                        if (!empty($strafen_in_durchschnitt_nicht_anwesende)) {
+                            foreach ($strafen_in_durchschnitt_nicht_anwesende as $strafe) {
+                                $betrag = '';
+                                if (!empty($strafen_mitglieder)) {
+                                    foreach ($strafen_mitglieder as $sm) {
+                                        if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
+                                            if ($sm['idstrafentyp'] == 0) {
+                                                if ($sm['grund'] === $strafe['grund']) {
+                                                    if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $betrag = $sm['betrag'] * $sm['preis'];
+                                                    } else {
+                                                        $betrag = $sm['betrag'];
+                                                    }
+                                                    break;
+                                                }
+                                            } else {
+                                                if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                    $betrag = $sm['betrag'] * $sm['preis'];
+                                                } else {
+                                                    $betrag = $sm['betrag'];
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if ($betrag !== '' && is_numeric($betrag)) {
+                                    $mitglied_durchschnitt_summe += $betrag;
+                                }
+                            }
+                        }
+                        if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)) {
+                            foreach ($strafen_nicht_in_durchschnitt_nicht_anwesende as $strafe) {
+                                $betrag = '';
+                                if (!empty($strafen_mitglieder)) {
+                                    foreach ($strafen_mitglieder as $sm) {
+                                        if ($sm['idmitglieder'] == $mitglied['idmitglieder'] && $sm['idstrafentyp'] == $strafe['idstrafentyp']) {
+                                            if ($sm['idstrafentyp'] == 0) {
+                                                if ($sm['grund'] === $strafe['grund']) {
+                                                    if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                        $betrag = $sm['betrag'] * $sm['preis'];
+                                                    } else {
+                                                        $betrag = $sm['betrag'];
+                                                    }
+                                                    break;
+                                                }
+                                            } else {
+                                                if (!empty($sm['istanzahl']) && $sm['istanzahl']) {
+                                                    $betrag = $sm['betrag'] * $sm['preis'];
+                                                } else {
+                                                    $betrag = $sm['betrag'];
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if ($betrag !== '' && is_numeric($betrag)) {
+                                    $mitglied_normal_summe += $betrag;
+                                }
+                            }
+                        }
+                        $mitglied_gesamt = $mitglied_durchschnitt_summe + $mitglied_normal_summe + $durchschnitt_zwischensumme;
+                        $gesamt_summe_nicht_anwesende += $mitglied_gesamt;
+                    }
+                    // Spalten zählen
+                    $spalten = 1;
+                    if (!empty($strafen_in_durchschnitt_nicht_anwesende)) {
+                        $spalten += count($strafen_in_durchschnitt_nicht_anwesende) + 1; // +1 für Zwischensumme
+                    }
+                    if (!empty($strafen_nicht_in_durchschnitt_nicht_anwesende)) {
+                        $spalten += count($strafen_nicht_in_durchschnitt_nicht_anwesende);
+                    }
+                    // +1 für Durchschnitt (Anwesende)
+                    $spalten += 1;
+                    ?>
+                    <tr style="background:rgb(110, 110, 110);font-weight:bold;">
+                        <td colspan="<?= $spalten ?>" style="text-align:right;">Summe aller Nicht-Anwesenden</td>
+                        <td><strong><?= number_format($gesamt_summe_nicht_anwesende, 2, ',', '.') ?> €</strong></td>
+                    </tr>
                 </tbody>
             </table>
         <?php } ?>
